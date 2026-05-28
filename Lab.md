@@ -14,8 +14,9 @@ The work is split into three live demos followed by one exercise.
 ## Overview
 
 - In this demo, you will show how Copilot changes its output when the workspace includes the correct schema file.
+- Clone the repo 
 
-You will work with these files:
+- we will work with the following files:
 
 | Item | Purpose |
 |---|---|
@@ -23,7 +24,9 @@ You will work with these files:
 | `db.js` | The file where Copilot generates code |
 | `schema.sql` | The source of truth for the user table columns |
 
-## Prep
+- Keep all other files like `legacy_v1_backup.sql` and `scratchpad.txt` outside the workspace
+
+## Tab Hygiene
 
    
 1. Open `db.js`.
@@ -55,12 +58,12 @@ The code should look reasonable but rely on guessed column names because the sch
 
 1. Add `schema.sql` to the `module1-demo` workspace.
 2. Open `schema.sql` in VS Code.
-3. Keep `db.js` open.
+3. Keep `db.js` open in VS Code.
 4. Remove the previous generated output from `db.js`.
 
 ## Step 3: Generate the function again with schema context
 
-Run Copilot again with this prompt:
+Run Copilot again with the following prompt:
 
 ```text
 Write a Node.js function using pg to insert a new user using #file:schema.sql.
@@ -89,15 +92,15 @@ Accept the output only if the generated code clearly follows the schema.
 
 ## Overview
 
-In this demo, you will show how a broad prompt can drift toward the wrong files when the workspace contains noisy context.
+In this demo, we will show how a broad prompt can drift towards the wrong files when the workspace contains noisy context.
 
-## Prep
+## Tab Hygiene
 
 For the first run:
 
-1. Copy `legacy_v1_backup.sql` and `scratchpad.txt` into `module1-demo`.
-2. Move `schema.sql` outside the current folder.
-3. Open `db.js`, `legacy_v1_backup.sql`, and `scratchpad.txt`.
+1. Add back `legacy_v1_backup.sql` and `scratchpad.txt` into `module1-demo`.
+2. Move `schema.sql` outside the workspace.
+3. Open `db.js`, `legacy_v1_backup.sql`, and `scratchpad.txt` in VS Code.
 
 ## Step 1: Run a broad prompt with noisy context
 
@@ -115,11 +118,17 @@ Check whether the generated output uses older or mixed fields such as:
 - `login_name`
 - `pwd_hash`
 
-Also check for generic fields or inconsistent assumptions that do not match the current schema.
+- Also check for generic fields or inconsistent assumptions that do not match the current schema.
 
 ## Expected Outcome
 
-Copilot may anchor on the wrong file because the prompt is broad and the workspace includes competing signals.
+- Copilot may anchor on the wrong file because the prompt is broad and the workspace includes competing signals.
+- Following can be noticed in the generated output
+  - older schema fields such as user_id, login_name, or pwd_hash
+  - generic user fields
+  - mixed assumptions that do not match the current schema
+
+- Vague prompts result in Copilot relying on entire workspace context. Since LLMs are non-deterministic, always validate the output—even if it correctly leverages schema.sql to ensure accuracy
 
 ## Step 2: Curate the open tabs
 
@@ -148,8 +157,9 @@ Accept the output only if it is easier to review against the current schema and 
 
 ## Expected Outcome
 
-The suggestion should align more closely with the current schema because the prompt is more specific and the open tabs are cleaner.
+- The suggestion should align more closely with the current schema because the prompt is more specific and the open tabs are cleaner.
 
+- Note: The generated output may slightly vary due non deterministic nature of LLM and less informative prompt
 ---
 
 # Live Demo 3 - Prompting Techniques
@@ -177,7 +187,7 @@ Paste these examples into `db.js`:
 
 ### Step 2: Ask Copilot to continue the pattern
 
-Run:
+- Open Ask in Chat with Cmd+I or Ctrl+I and use the following prompt
 
 ```text
 Create a third class for 'UserNotFoundError' using the same pattern, but not as a comment
@@ -185,14 +195,26 @@ Create a third class for 'UserNotFoundError' using the same pattern, but not as 
 
 ### Review Criteria
 
-Check whether the generated class:
+- Check whether the generated class:
 
 - extends `Error`
 - uses the same constructor pattern
 - assigns an error code
 - follows the same style as the two examples
 
+## Expected Outcome
+
+- Copilot creates `UserNotFoundError` function by following the two pattern examples.
+
+- The generated class uses the same structure, extends Error, and assigns an error code.
+
+- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
+
 ## Part B: Chain-of-Thought prompting
+
+- Next, we will use Chain-of-Thought prompting for a small user-status lookup.
+
+- The task is to find a user by email_address and return the user’s name, email, and account status.
 
 ### Step 1: Reset the file
 
@@ -201,7 +223,7 @@ Check whether the generated class:
 
 ### Step 2: Ask for a plan before code
 
-Run:
+- Paste the prompt below into Copilot Chat:
 
 ```text
 Before writing code, give a short 3-step plan.
@@ -227,11 +249,26 @@ Also confirm that the code:
 - returns the requested fields
 - uses a parameterized query
 
+## Expected Outcome
+
+- Copilot first outlines a short lookup plan.
+
+- The plan covers finding the user by `email_address`, handling the no-match case, and returning the requested status details.
+
+- The generated `getUserStatus` function then follows the plan using a parameterized query and schema fields.
+
+- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
+
+
 ## Part C: Constrained prompting
+
+- Finally, we will use constrained prompting for a secure clearance-user lookup.
+
+- The task is to retrieve a user by email_address, check internal_clearance_level, and return only the allowed fields.
 
 ### Step 1: Add acceptance criteria
 
-Paste this block into `db.js`:
+- Paste the following block into `db.js`:
 
 ```javascript
 /**
@@ -245,7 +282,7 @@ Paste this block into `db.js`:
 
 ### Step 2: Run the constrained prompt
 
-Ask Copilot:
+- Open Ask in Chat and paste the prompt below:
 
 ```text
 Implement `getClearanceUser(pool, emailAddress)` using Node.js `pg` and `#schema.sql`.
@@ -267,35 +304,24 @@ Accept the output only if it:
 - checks `internal_clearance_level`
 - returns only `full_name` and `account_status`
 
-## Manual Verification
+## Expected Outcome
 
-After each prompting technique:
+- Copilot generates `getClearanceUser` from the selected acceptance criteria.
 
-1. Compare the result against the prompt or acceptance criteria.
-2. Reject outputs that add fields, skip constraints, or use the wrong schema names.
-3. Point out how the prompt style changed what was easy to review.
+- The query filters by `email_address`, uses parameterized values, and avoids SELECT *.
+
+- The function checks internal_clearance_level, then returns only full_name and account_status.
+
+- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
 
 ---
 
-# Exercise - The Tale of Two Prompts
+# Activity - The Tale of Two Prompts
 
-## Exercise Overview
-
-This exercise compares a broad prompt with an acceptance-criteria-driven prompt for the same task: updating a user's clearance level.
-
-You will use:
-
-- `db.js`
-- `schema.sql`
-- `SecurityPolicy.ts`
-
-## Part A: Run the broad prompt
-
-### Step 1: Prepare the files
-
-1. Open `db.js` and `schema.sql`.
-2. Create `SecurityPolicy.ts` in `module1-demo`.
-3. Add this code:
+- This exercise compares a broad prompt with an acceptance-criteria-driven prompt for the same task: updating a user's clearance level.
+- Let's consider two prompts prompt A and Prompt B
+- For the Prompt A, Start by opening db.js, schema.sql in VS Code.
+- Create a new file `SecurityPolicy.ts` in module1-demo and add the following code:
 
 ```typescript
 export const ClearanceRules = {
@@ -305,40 +331,15 @@ export const ClearanceRules = {
   ERROR_CODE: "INSUFFICIENT_PRIVILEGE"
 };
 ```
-
-### Step 2: Run Prompt A
-
-Store the generated output so you can compare it with Prompt B later.
-
+- Now run the following Prompt A in the chat and store the output in a .txt file to be able to compare it against Prompt B output
 ```text
 Write a function to update a user's clearance level.
 ```
 
-### Review Criteria
+- For the Prompt B, Clear the previous output from db.js.
 
-Check whether the result:
-
-- updates `internal_clearance_level`
-- uses a parameterized query
-- handles user-not-found
-
-Also note what is missing:
-
-- min/max validation from `SecurityPolicy.ts`
-- audit logging behavior
-- explicit validation response behavior
-
-## Part B: Run the acceptance-criteria prompt
-
-### Step 1: Reset the file
-
-Clear the previous output from `db.js`.
-
-### Step 2: Add the AC block
-
-Paste this block into `db.js`:
-
-```javascript
+- Paste the following acceptance-criteria block below in db.js file:
+```
 /**
  * AC - Update Clearance:
  * 1. Use internal_clearance_level from #schema.sql.
@@ -346,37 +347,11 @@ Paste this block into `db.js`:
  * 3. Use parameterized queries for pg.
  * 4. Return a 400 status if validation fails.
  * 5. Log the change only if REQUIRES_AUDIT_LOG is true.
+
  */
+ ```
+- With the block set and selected, use the Ask in chat option to run Prompt B:
 ```
-
-### Step 3: Run Prompt B
-
-Select the AC block and run:
-
-```text
 Reason through how #SecurityPolicy.ts changes validation for #schema.sql, then implement the function following all 5 AC points.
+
 ```
-
-## What a Correct Answer Should Include
-
-The stronger prompt should produce code that:
-
-- uses `internal_clearance_level`
-- enforces `MIN_LEVEL` and `MAX_LEVEL`
-- uses parameterized queries
-- returns a `400` status for validation failures
-- logs the change only when `REQUIRES_AUDIT_LOG` is `true`
-
-## Comparison Questions
-
-Use these questions to review the two outputs:
-
-1. Which requirements were only satisfied by Prompt B?
-2. Did Prompt A produce reasonable code that still missed project rules?
-3. Which output is easier to validate against explicit acceptance criteria?
-
-## Expected Takeaway
-
-Prompt A is broad and leaves requirements implied.
-
-Prompt B encodes the contract up front, making the generated output easier to review for correctness.

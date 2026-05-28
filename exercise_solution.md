@@ -12,37 +12,22 @@ Prompt used:
 Write a function to update a user's clearance level.
 ```
 
-## Expected Characteristics
+## Expected output
 
-A reasonable Prompt A solution will usually:
+- Copilot creates a working update function that uses internal_clearance_level, a parameterized query, and a user-not-found check.
 
-- update `internal_clearance_level`
-- use a parameterized `pg` query
-- handle a missing user in some form
+- Because Prompt A does not mention SecurityPolicy.ts, the code does not enforce min/max clearance rules or audit logging behavior.
 
-## Likely Gaps
+- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
 
-Because Prompt A does not reference `SecurityPolicy.ts`, the output will usually miss some or all of the following:
+![screenshot](./Demo-Exercise-screenshots/activity_prompt_a_broad_output.png)
 
-- validation against `MIN_LEVEL`
-- validation against `MAX_LEVEL`
-- use of `ERROR_CODE`
-- a `400` status for validation failure
-- conditional audit logging based on `REQUIRES_AUDIT_LOG`
-
-## Instructor Comparison Point
-
-Prompt A can still produce working-looking code. The issue is not that the code is useless. The issue is that important project rules remain unstated, so they are easy for Copilot to omit.
 
 ---
 
 # Part B - Prompt B Output
 
-Prompt used:
 
-```text
-Reason through how #SecurityPolicy.ts changes validation for #schema.sql, then implement the function following all 5 AC points.
-```
 
 Acceptance criteria block:
 
@@ -57,46 +42,21 @@ Acceptance criteria block:
  */
 ```
 
-## Expected Characteristics
+Prompt used:
 
-A strong Prompt B solution should:
+```text
+Reason through how #SecurityPolicy.ts changes validation for #schema.sql, then implement the function following all 5 AC points.
+```
 
-- read or apply `MIN_LEVEL` and `MAX_LEVEL` from `SecurityPolicy.ts`
-- validate the requested clearance value before updating
-- use `internal_clearance_level` from `schema.sql`
-- use parameterized queries for database updates
-- return a `400` status when validation fails
-- log the change only when `REQUIRES_AUDIT_LOG` is `true`
+## Expected output
 
-## What To Accept
+- Prompt A is a broad request, so the requirements are implied.
 
-Accept the Prompt B output if it clearly includes all five AC points and does not fall back to generic or legacy field names.
+- Prompt B is AC-encoded, so validation rules, audit behavior, and implementation expectations are stated before code is generated.
 
-## What To Reject
+- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
 
-Reject the output if it:
-
-- skips min/max validation
-- updates the wrong column
-- uses string interpolation instead of parameterized queries
-- ignores the required `400` validation response
-- logs unconditionally without checking `REQUIRES_AUDIT_LOG`
+![screenshot](./Demo-Exercise-screenshots/activity_prompt_b_ac_output.png)
 
 ---
 
-# Comparison Summary
-
-## Why Prompt B Is Stronger
-
-Prompt B gives Copilot:
-
-- the current schema reference
-- the policy file reference
-- the validation contract
-- the expected behavior for errors and logging
-
-That makes the result easier to review against concrete requirements.
-
-## Final Teaching Point
-
-The exercise is not about making Prompt A fail. It is about showing that a broad prompt can generate plausible code while still missing important project constraints. Acceptance criteria make those constraints explicit before code is generated.
