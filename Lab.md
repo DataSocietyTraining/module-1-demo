@@ -16,6 +16,10 @@ This lab covers two practical ideas:
 
 The work is split into three live demos followed by one exercise.
 
+## Initial state setup: 
+- Move all files except `Lab.md` and `exercise_solution.md` outside the workspace into a different folder .
+- Note:- do not delete the files
+
 ---
 
 # Lab 1 - Workspace Context and Schema Awareness
@@ -26,6 +30,7 @@ The work is split into three live demos followed by one exercise.
 - Clone the repo 
 
 - we will work with the following files:
+- - Add the following files in to the `module1-demo` workspace
 
 | Item | Purpose |
 |---|---|
@@ -68,7 +73,8 @@ The code should look reasonable but rely on guessed column names because the sch
 1. Add `schema.sql` to the `module1-demo` workspace.
 2. Open `schema.sql` in VS Code.
 3. Keep `db.js` open in VS Code.
-4. Remove the previous generated output from `db.js`.
+4. Undo the previous generated output in `db.js`.
+5. Maintain `db.js` as active tab
 
 ## Step 3: Generate the function again with schema context
 
@@ -113,7 +119,7 @@ For the first run:
 
 ## Step 1: Run a broad prompt with noisy context
 
-Clear any previous generated code from `db.js`, then run the following prompt:
+Undo any previous generated code in `db.js`, maintain this as active tab and run the following prompt in chat:
 
 ```text
 Write a function to save a user based on table definition.
@@ -180,6 +186,7 @@ This demo shows three prompt styles:
 - few-shot prompting
 - Chain-of-Thought prompting
 - constrained prompting
+Use `db.js` along with the code generated in Lab-2 
 
 Keep `db.js` active and `schema.sql` open unless the step says otherwise.
 
@@ -187,7 +194,7 @@ Keep `db.js` active and `schema.sql` open unless the step says otherwise.
 
 ### Step 1: Provide examples
 
-Paste these examples into `db.js`:
+- Paste these examples into `db.js` after the last line `module.exports = { registerUser, ValidationError, DatabaseError };`
 
 ```text
 // Example 1: class DatabaseError extends Error { constructor(msg) { super(msg); this.code = 'DB_ERR'; } }
@@ -217,7 +224,7 @@ Create a third class for 'UserNotFoundError' using the same pattern, but not as 
 
 - The generated class uses the same structure, extends Error, and assigns an error code.
 
-- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
+- Note: The generated output may slightly vary due to non-deterministic nature of LLM and less informative prompt
 
 ## Part B: Chain-of-Thought prompting
 
@@ -227,7 +234,7 @@ Create a third class for 'UserNotFoundError' using the same pattern, but not as 
 
 ### Step 1: Reset the file
 
-1. Clear `db.js`.
+1. Undo the previous changes in  `db.js`.
 2. Keep `schema.sql` open.
 
 ### Step 2: Ask for a plan before code
@@ -266,7 +273,7 @@ Also confirm that the code:
 
 - The generated `getUserStatus` function then follows the plan using a parameterized query and schema fields.
 
-- Note: The generated output may slightly vary due to non deterministic nature of LLM and less informative prompt
+- Note: The generated output may slightly vary due to non-deterministic nature of LLM and less informative prompt
 
 
 ## Part C: Constrained prompting
@@ -277,7 +284,7 @@ Also confirm that the code:
 
 ### Step 1: Add acceptance criteria
 
-- Paste the following block into `db.js`:
+- - Paste the following block into `db.js` below the last line of `getUserStatus` function:
 
 ```javascript
 /**

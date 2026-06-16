@@ -3,6 +3,7 @@
 This file summarizes what learners should observe from the exercise outputs.
 
 ---
+# Task - 1 :solution
 
 # Part A - Prompt A Output
 
@@ -24,6 +25,7 @@ Write a function to update a user's clearance level.
 
 
 ---
+# Task - 2 :solution
 
 # Part B - Prompt B Output
 
