@@ -179,6 +179,8 @@ Accept the output only if it is easier to review against the current schema and 
 
 # Lab 3 - Prompting Techniques
 
+- Lab 3 continues with the code generated from Lab 2
+
 ## Overview
 
 This demo shows three prompt styles:
